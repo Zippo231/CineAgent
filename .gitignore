@@ -13,3 +13,6 @@ MTPs-Main-Container.txt
 # and useless temp file system
 .DS_Store
 Thumbs.db
+
+# key storage (per tenere i nostri segreti eheh)
+config.properties

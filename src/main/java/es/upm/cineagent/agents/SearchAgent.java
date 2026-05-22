@@ -22,9 +22,21 @@ public class SearchAgent extends AgentBase {
 
     public static final String NICKNAME = "SearchAgent";
 
-    // *** SUSTITUIR POR TU CLAVE DE API DE TMDB ***
-    // !-!-!-! THE API KEY IS IN THE WHATSAPP GROUP DESCRIPTION !-!-!-!
-    private static final String TMDB_API_KEY = "PUT YOUR KEY HERE";
+    // add the config.properties file in the main folder. 
+    private String getApiKey() {
+        try {
+            java.util.Properties prop = new java.util.Properties();
+            prop.load(new java.io.FileInputStream("config.properties"));
+            return prop.getProperty("TMDB_API_KEY");
+        } catch (Exception e) {
+            System.err.println("File config.properties not found. Bro check the whatsapp group");
+            return "KEY_NOT_FOUND";
+        }
+    }
+
+    // - OPTION 2 - uncomment next code line - and fix the "queryTMDB"
+    // !-!-!-! THE API KEY IS IN THE WHATSAPP GROUP !-!-!-!
+    //private static final String TMDB_API_KEY = "PUT YOUR KEY HERE";
     private static final String TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
     @Override
@@ -120,7 +132,7 @@ public class SearchAgent extends AgentBase {
 
             // Construimos la URL con los filtros seleccionados
             StringBuilder url = new StringBuilder(TMDB_BASE_URL + "/discover/movie");
-            url.append("?api_key=").append(TMDB_API_KEY);
+            url.append("?api_key=").append(getApiKey());
             url.append("&language=es-ES");          // Respuesta en español
             url.append("&vote_count.gte=80");       // Mínimo de votos para fiabilidad
             url.append("&sort_by=popularity.desc"); // Ordenar por popularidad
