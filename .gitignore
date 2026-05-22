@@ -16,3 +16,6 @@ Thumbs.db
 
 # key storage (per tenere i nostri segreti eheh)
 config.properties
+
+# sorry guys I made this translated document for me 
+enunciado-eng.txt
