@@ -71,7 +71,8 @@ public class DisplayAgent extends AgentBase {
             // Riduciamo l'immagine a 48x48 pixel per bilanciarla col font grandezza 18
             java.awt.Image scaledImg = img.getScaledInstance(48, 48, java.awt.Image.SCALE_SMOOTH);
             headerTitle.setIcon(new ImageIcon(scaledImg));
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+        }
         headerTitle.setFont(new Font("Arial", Font.BOLD, 18));
         headerTitle.setForeground(Color.WHITE);
         header.add(headerTitle, BorderLayout.WEST);
@@ -91,6 +92,12 @@ public class DisplayAgent extends AgentBase {
         JScrollPane scrollPane = new JScrollPane(moviesPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
+        // I added these 4 lines to make the scroll bar better, both in X and Y
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getVerticalScrollBar().setBlockIncrement(80);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+        scrollPane.getHorizontalScrollBar().setBlockIncrement(80);
+        // - - -
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         displayFrame.setContentPane(mainPanel);
@@ -147,7 +154,7 @@ public class DisplayAgent extends AgentBase {
         posterLabel.setPreferredSize(new Dimension(62, 92));
         posterLabel.setHorizontalAlignment(SwingConstants.CENTER);
         posterLabel.setFont(new Font("Arial", Font.PLAIN, 28));
-        posterLabel.setText("\uD83C\uDFAC"); // icono por defecto mientras carga
+        posterLabel.setText("\u25B6"); // icono por defecto mientras carga
 
         String posterPath = m.has("poster_path") && !m.get("poster_path").isJsonNull()
                 ? m.get("poster_path").getAsString()
@@ -172,22 +179,58 @@ public class DisplayAgent extends AgentBase {
                 year = " (" + rd.substring(0, 4) + ")";
         }
         JLabel titleLabel = new JLabel("#" + rank + "  " + title + year);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 15)); // Font più moderno
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // <--- FORZA L'ALLINEAMENTO A SINISTRA
 
         // Puntuación TMDB y CineAgent
         double tmdbRating = m.has("vote_average") ? m.get("vote_average").getAsDouble() : 0;
         double cineScore = m.has("cineAgentScore") ? m.get("cineAgentScore").getAsDouble() : 0;
-        JLabel ratingLabel = new JLabel(String.format(
-                "\u2B50 TMDB: %.1f/10     \uD83C\uDFAC CineAgent: %.0f%%",
-                tmdbRating, cineScore * 100));
-        ratingLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        ratingLabel.setForeground(new Color(60, 100, 180));
+
+        JPanel ratingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        ratingPanel.setOpaque(false);
+        ratingPanel.setAlignmentX(Component.LEFT_ALIGNMENT); // <--- FORZA L'ALLINEAMENTO A SINISTRA
+
+        JLabel tmdbLabel = new JLabel(String.format("%.1f / 10", tmdbRating));
+        try {
+            ImageIcon starIcon = new ImageIcon(
+                    new ImageIcon(getClass().getResource("/star.png"))
+                            .getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+            tmdbLabel.setIcon(starIcon);
+            tmdbLabel.setIconTextGap(6);
+        } catch (Exception ex) {
+        }
+        tmdbLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tmdbLabel.setForeground(new Color(60, 100, 180));
+
+        JLabel cineLabel = new JLabel(String.format("%.0f%%", cineScore * 100));
+        try {
+            ImageIcon filmIcon = new ImageIcon(
+                    new ImageIcon(getClass().getResource("/film-slate.png"))
+                            .getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+            cineLabel.setIcon(filmIcon);
+            cineLabel.setIconTextGap(6);
+        } catch (Exception ex) {
+        }
+        cineLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        cineLabel.setForeground(new Color(60, 100, 180));
+
+        ratingPanel.add(tmdbLabel);
+        ratingPanel.add(cineLabel);
 
         // Barra visual de puntuación CineAgent
         JProgressBar scoreBar = new JProgressBar(0, 100);
         scoreBar.setValue((int) (cineScore * 100));
-        scoreBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 6));
-        scoreBar.setForeground(getScoreColor(cineScore));
+
+        // --- THE FIX: Forces a flat modern UI instead of the glitchy Windows 3D bar
+        // ---
+        scoreBar.setUI(new javax.swing.plaf.basic.BasicProgressBarUI());
+
+        Dimension barSize = new Dimension(400, 6);
+        scoreBar.setPreferredSize(barSize);
+        scoreBar.setMaximumSize(barSize);
+        scoreBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scoreBar.setForeground(getScoreColor(cineScore)); // The green/yellow/red fill
+        scoreBar.setBackground(new Color(235, 235, 245)); // Light gray background track
         scoreBar.setBorderPainted(false);
 
         // Sinopsis (truncada)
@@ -195,12 +238,14 @@ public class DisplayAgent extends AgentBase {
         if (overview.length() > 130)
             overview = overview.substring(0, 130) + "...";
         JLabel overviewLabel = new JLabel("<html><body style='width:380px'>" + overview + "</body></html>");
-        overviewLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        overviewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         overviewLabel.setForeground(Color.DARK_GRAY);
+        overviewLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // <--- FORZA L'ALLINEAMENTO A SINISTRA
 
+        // Aggiungiamo i componenti al pannello informazioni
         infoPanel.add(titleLabel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 3)));
-        infoPanel.add(ratingLabel);
+        infoPanel.add(ratingPanel);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 3)));
         infoPanel.add(scoreBar);
         infoPanel.add(Box.createRigidArea(new Dimension(0, 4)));

@@ -110,7 +110,7 @@ public class SearchAgent extends AgentBase {
             String language  = prefs.get("language").getAsString();
 
             StringBuilder url = new StringBuilder(TMDB_BASE_URL + "/discover/movie");
-            url.append("?api_key=").append(TMDB_API_KEY);
+            url.append("?api_key=").append(getApiKey());
             url.append("&language=es-ES");
             url.append("&vote_count.gte=80");
             url.append("&sort_by=popularity.desc");

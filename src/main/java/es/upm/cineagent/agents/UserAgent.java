@@ -165,14 +165,21 @@ public class UserAgent extends AgentBase {
 
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // --- Bot\u00f3n de b\u00fasqueda ---
-        searchBtn = new JButton("\uD83D\uDD0D Buscar pel\u00edculas");
+        // --- Botón de búsqueda ---
+        searchBtn = new JButton(" Buscar películas");
+        try {
+            ImageIcon searchIcon = new ImageIcon(
+                    new ImageIcon(getClass().getResource("/magnifying-glass.png"))
+                            .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+            searchBtn.setIcon(searchIcon);
+            searchBtn.setIconTextGap(8);
+        } catch (Exception ex) { }
         searchBtn.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        searchBtn.setPreferredSize(new Dimension(0, 50)); // Bottone più grande
-        searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Cursore a manina
-        searchBtn.setBackground(new Color(33, 150, 243)); // Colore blu stile "Material Design"
-        searchBtn.setForeground(Color.BLACK); // Modificato da WHITE a BLACK
-        searchBtn.setFocusPainted(false); // Rimuove il bordino brutto quando è cliccato
+        searchBtn.setPreferredSize(new Dimension(0, 50)); 
+        searchBtn.setCursor(new Cursor(Cursor.HAND_CURSOR)); 
+        searchBtn.setBackground(new Color(33, 150, 243)); 
+        searchBtn.setForeground(Color.BLACK); 
+        searchBtn.setFocusPainted(false); 
         searchBtn.addActionListener(e -> onSearchClicked());
         mainPanel.add(searchBtn, BorderLayout.SOUTH);
 
